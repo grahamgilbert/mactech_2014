@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>_metadata</key>
+    <dict>
+        <key>created_by</key>
+        <string>grahamgilbert</string>
+        <key>creation_date</key>
+        <date>2014-10-09T20:24:11Z</date>
+        <key>munki_version</key>
+        <string>2.0.0.2238</string>
+        <key>os_version</key>
+        <string>10.10</string>
+    </dict>
+    <key>autoremove</key>
+    <false/>
+    <key>catalogs</key>
+    <array>
+        <string>production</string>
+    </array>
+    <key>installer_type</key>
+    <string>nopkg</string>
+    <key>minimum_os_version</key>
+    <string>10.8.0</string>
+    <key>name</key>
+    <string>7DayReboot</string>
+    <key>display_name</key>
+    <string>System Reboot Required. This will be enforced after 14 days.</string>
+    <key>description</key>
+    <string>Reboots a Mac</string>
+    <key>category</key>
+    <string>System</string>
+    <key>installcheck_script</key>
+    <string>#!/bin/bash
+
+days=`uptime | awk '{ print $4 }' | sed 's/,//g'`
+num=`uptime | awk '{ print $3 }'`
+
+# now check how long they've been awake
+if [ $days = "days" ]; then
+
+    if [ $num -gt "14" ]; then
+        exit 0
+    else
+        exit 1
+    fi
+else
+    exit 1
+fi</string>
+    <key>RestartAction</key>
+    <string>RequireRestart</string>
+    <key>postinstall_script</key>
+    <string>#!/bin/bash
+
+exit 0</string>
+    <key>version</key>
+    <string>1.0</string>
+    <key>forced_install_after_date</key>
+    <date>2011-08-03T13:00:00Z</date>
+</dict>
+</plist>

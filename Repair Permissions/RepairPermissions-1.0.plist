@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>_metadata</key>
+    <dict>
+        <key>created_by</key>
+        <string>grahamgilbert</string>
+        <key>creation_date</key>
+        <date>2014-10-09T20:24:11Z</date>
+        <key>munki_version</key>
+        <string>2.0.0.2238</string>
+        <key>os_version</key>
+        <string>10.10</string>
+    </dict>
+    <key>autoremove</key>
+    <false/>
+    <key>catalogs</key>
+    <array>
+        <string>production</string>
+    </array>
+    <key>installer_type</key>
+    <string>nopkg</string>
+    <key>minimum_os_version</key>
+    <string>10.8.0</string>
+    <key>name</key>
+    <string>RepairPermissions</string>
+    <key>display_name</key>
+    <string>Repair Disk Permissions</string>
+    <key>description</key>
+    <string>Repairs disk permissions. Use when instructed by the helpdesk</string>
+    <key>category</key>
+    <string>System</string>
+    <key>installcheck_script</key>
+    <string>#!/usr/bin/python
+
+import plistlib
+import sys
+
+# Make Munki forget about it
+
+installinfoPath = "/Library/Managed Installs/InstallInfo.plist"
+installinfo = plistlib.readPlist(installinfoPath)
+
+my_item = 'RepairPermissions'
+
+for item in installinfo.get('optional_installs', []):
+    if item['name'] == my_item:
+        item['installed'] = False
+
+installinfo = plistlib.writePlist(installinfo, installinfoPath)
+
+SelfServeManifestPath = "/Library/Managed Installs/manifests/SelfServeManifest"
+SelfServeManifest = plistlib.readPlist(SelfServeManifestPath)
+for item in SelfServeManifest.get('managed_installs', []):
+    if item == my_item:
+        SelfServeManifest['managed_installs'].remove(item)
+
+print SelfServeManifest
+
+SelfServeManifest = plistlib.writePlist(SelfServeManifest, SelfServeManifestPath)
+sys.exit(0)</string>
+    <key>RestartAction</key>
+    <string>RequireRestart</string>
+    <key>postinstall_script</key>
+    <string>#!/usr/bin/python
+
+import plistlib
+import subprocess
+import sys
+
+# Run the repair permissions
+
+cmd = ['/usr/sbin/diskutil', 'repairPermissions', '/']
+task = subprocess.Popen(cmd).communicate()[0]
+
+# Make Munki forget about it
+
+installinfoPath = "/Library/Managed Installs/InstallInfo.plist"
+installinfo = plistlib.readPlist(installinfoPath)
+
+my_item = 'RepairPermissions'
+
+for item in installinfo.get('optional_installs', []):
+    if item['name'] == my_item:
+        item['installed'] = False
+
+installinfo = plistlib.writePlist(installinfo, installinfoPath)
+
+SelfServeManifestPath = "/Library/Managed Installs/manifests/SelfServeManifest"
+SelfServeManifest = plistlib.readPlist(SelfServeManifestPath)
+for item in SelfServeManifest.get('managed_installs', []):
+    if item == my_item:
+        SelfServeManifest['managed_installs'].remove(item)
+
+print SelfServeManifest
+
+SelfServeManifest = plistlib.writePlist(SelfServeManifest, SelfServeManifestPath)</string>
+    <key>version</key>
+    <string>1.0</string>
+</dict>
+</plist>

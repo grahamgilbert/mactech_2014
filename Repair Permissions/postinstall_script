@@ -1,0 +1,30 @@
+#!/usr/bin/python
+
+import plistlib
+import subprocess
+
+# Run the repair permissions
+
+cmd = ['/usr/sbin/diskutil', 'repairPermissions', '/']
+task = subprocess.Popen(cmd).communicate()[0]
+
+# Make Munki forget about it
+
+installinfoPath = "/Library/Managed Installs/InstallInfo.plist"
+installinfo = plistlib.readPlist(installinfoPath)
+
+my_item = 'RepairPermissions'
+
+for item in installinfo.get('optional_installs', []):
+    if item['name'] == my_item:
+        item['installed'] = False
+
+installinfo = plistlib.writePlist(installinfo, installinfoPath)
+
+SelfServeManifestPath = "/Library/Managed Installs/manifests/SelfServeManifest"
+SelfServeManifest = plistlib.readPlist(SelfServeManifestPath)
+for item in SelfServeManifest.get('managed_installs', []):
+    if item == my_item:
+        SelfServeManifest['managed_installs'].remove(item)
+
+SelfServeManifest = plistlib.writePlist(SelfServeManifest, SelfServeManifestPath)

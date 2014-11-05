@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/usr/sbin/systemsetup -setnetworktimeserver ntp.company.com
+
+/usr/sbin/systemsetup -setusingnetworktime on
