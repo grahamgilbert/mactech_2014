@@ -1,0 +1,22 @@
+#!/usr/bin/python
+
+'''
+preflight script that will bail a Munki run on Wednesday between 5 and 7PM
+'''
+
+import datetime
+import sys
+
+# 0 = Monday, 6 = Sunday
+day_to_cancel = 4
+
+# hours between which the Munki run will bail on
+lower_time = 7
+upper_time = 9
+
+day_of_week = datetime.datetime.today().weekday()
+current_time = int(datetime.datetime.now().strftime('%H'))
+if day_of_week == day_to_cancel:
+    if lower_time <= current_time <= lower_time:
+        print 'bailing'
+        sys.exit(1)
