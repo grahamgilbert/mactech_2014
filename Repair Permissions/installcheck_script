@@ -2,8 +2,9 @@
 
 import plistlib
 import sys
+import os
 
-# Make Munki forget about it. We do this to catch if anything went wrong during the real 'install'
+# Make Munki forget about it
 
 installinfoPath = "/Library/Managed Installs/InstallInfo.plist"
 installinfo = plistlib.readPlist(installinfoPath)
@@ -17,10 +18,20 @@ for item in installinfo.get('optional_installs', []):
 installinfo = plistlib.writePlist(installinfo, installinfoPath)
 
 SelfServeManifestPath = "/Library/Managed Installs/manifests/SelfServeManifest"
+
+if ( not os.path.isfile(SelfServeManifestPath)):
+   d = { 'managed_installs':[''], }
+   plistlib.writePlist(d, SelfServeManifestPath)
+else:
+    print("%s exists." % SelfServeManifestPath)
+
 SelfServeManifest = plistlib.readPlist(SelfServeManifestPath)
+
 for item in SelfServeManifest.get('managed_installs', []):
     if item == my_item:
         SelfServeManifest['managed_installs'].remove(item)
+
+print SelfServeManifest
 
 SelfServeManifest = plistlib.writePlist(SelfServeManifest, SelfServeManifestPath)
 sys.exit(0)
